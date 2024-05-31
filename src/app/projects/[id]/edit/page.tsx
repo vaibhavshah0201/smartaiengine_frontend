@@ -1,42 +1,75 @@
-import { Metadata } from "next";
+"use client";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "Next.js Tables | TailAdmin - Next.js Dashboard Template",
-  description:
-    "This is Next.js Tables page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
-};
+import { useParams, useRouter } from "next/navigation";
+import { projectService } from "@/services/project.service";
+import { useEffect, useState } from "react";
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 const ProjectsPage = () => {
+  const param: any = useParams();
+  const router = useRouter();
+  const [projectDetails, setProjectDetails] = useState<any>(null);
+  const [projectName, setProjectName] = useState<string>("");
+  const [projectDescription, setProjectDescription] = useState<string>("");
+
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+    const res = await projectService.editProject(param.id, {
+      name: projectName,
+      description: projectDescription,
+    });
+    if (res.code == 200) {
+      router.push("/projects");
+    }
+  };
+
+  useEffect(() => {
+    projectService.getProjectDetails(param.id).then((result) => {
+      setProjectDetails(result.result);
+      setProjectName(result.result.name);
+      setProjectDescription(result.result.description);
+    });
+  }, []);
+
   return (
     <DefaultLayout>
+      <Breadcrumb
+        pageName={projectDetails ? projectDetails.name : "Manage"}
+        displayProjects={true}
+      />
       <div className="mx-auto max-w-270">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-title-md2 font-semibold text-black dark:text-white">
-            Add New Rule
+            Edit Project
           </h2>
         </div>
 
         <div className="grid grid-cols-5 gap-8">
           <div className="col-span-5 xl:col-span-3">
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              
+              <div className="border-b border-stroke px-7 py-4 dark:border-strokedark">
+                <h3 className="font-medium text-black dark:text-white">
+                  Project Information
+                </h3>
+              </div>
               <div className="p-7">
-                <form action="#">
+                <form action="PUT" onSubmit={handleSubmit}>
                   <div className="mb-5.5">
                     <label
                       className="mb-3 block text-sm font-medium text-black dark:text-white"
                       htmlFor="Username"
                     >
-                      Rule Name
+                      Name
                     </label>
                     <input
                       className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                       type="text"
                       name="Username"
                       id="Username"
-                      placeholder="Rule Name"
+                      placeholder="Project Name"
+                      value={projectName}
+                      onChange={(e: any) => setProjectName(e.target.value)}
                     />
                   </div>
 
@@ -45,7 +78,7 @@ const ProjectsPage = () => {
                       className="mb-3 block text-sm font-medium text-black dark:text-white"
                       htmlFor="Username"
                     >
-                      Rule Content
+                      Description
                     </label>
                     <div className="relative">
                       <span className="absolute left-4.5 top-4">
@@ -84,18 +117,22 @@ const ProjectsPage = () => {
                         name="bio"
                         id="bio"
                         rows={6}
-                        placeholder="Write your rule content here"
+                        placeholder="Project Description"
+                        value={projectDescription}
+                        onChange={(e: any) =>
+                          setProjectDescription(e.target.value)
+                        }
                       ></textarea>
                     </div>
                   </div>
 
                   <div className="flex justify-end gap-4.5">
-                    <Link href="/projects/manage">
+                    <Link href="/projects">
                       <button
                         className="flex justify-center rounded border border-stroke px-6 py-2 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
                         type="submit"
                       >
-                        Cancel
+                        Back
                       </button>
                     </Link>
                     <button

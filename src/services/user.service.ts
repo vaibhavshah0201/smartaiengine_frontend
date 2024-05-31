@@ -1,17 +1,17 @@
 import { BehaviorSubject } from "rxjs";
+import Cookies from "js-cookie";
 // import getConfig from "next/config";
-import Router from "next/router";
+// import Router from "next/router";
 
 import { alertService } from "@/services/alert.service";
 import { fetchWrapper } from "@/helpers/fetch-wrapper";
 
 // const { publicRuntimeConfig } = getConfig();
 // const baseUrl = `${publicRuntimeConfig.apiUrl}/users`;
-const baseUrl = `http://localhost:8000/user`;
+const baseUrl = `http://localhost:8000`;
 const userSubject: any = new BehaviorSubject(
   typeof window !== "undefined" && localStorage.getItem("user")
 );
-
 export const userService = {
   user: userSubject.asObservable(),
   get userValue() {
@@ -27,15 +27,23 @@ export const userService = {
 };
 
 async function login(username: any, password: any) {
-  const user = await fetchWrapper.post(`${baseUrl}/login`, {
+  const response: any = await fetchWrapper.post(`${baseUrl}/login`, {
     username,
     password,
   });
-
+  console.log(response.result);
+  const data = {
+    id: response.result.id,
+    username: response.result.username,
+  };
   // publish user to subscribers and store in local storage to stay logged in between page refreshes
-  userSubject.next(user);
-  localStorage.setItem("user", JSON.stringify(user));
-  return user;
+  userSubject.next(response);
+  if (response.code === 200) {
+    Cookies.set("accessToken", response.accessToken);
+    Cookies.set("userDetails", JSON.stringify(data));
+    Cookies.set("refreshToken", response.refreshToken);
+  }
+  return response;
 }
 
 function logout() {
@@ -43,7 +51,7 @@ function logout() {
   // remove user from local storage, publish null to user subscribers and redirect to login page
   localStorage.removeItem("user");
   userSubject.next(null);
-  Router.push("/account/login");
+  // Router.push("/account/login");
 }
 
 async function register(user: any) {

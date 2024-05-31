@@ -1,20 +1,13 @@
+"use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import TableThree from "@/components/Tables/TableThree";
-import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import ProjectGrid from "@/components/Dashboard/Projects/ProjectGrid";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Next.js Tables | TailAdmin - Next.js Dashboard Template",
-  description:
-    "This is Next.js Tables page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
-};
-
 const ProjectsPage = () => {
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Projects" />
+      <Breadcrumb pageName="Projects" displayProjects={false} />
 
       <div className="flex flex-row gap-10">
         <Link

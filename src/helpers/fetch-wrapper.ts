@@ -1,8 +1,10 @@
-// import getConfig from "next/config";
+import getConfig from "next/config";
 import { userService } from "@/services";
-
+import Cookies from "js-cookie";
+import { useAuth } from "@/context/AuthContext";
+import authService from "@/services/auth.service";
 // const { publicRuntimeConfig } = getConfig();
-
+const accessToken: any = Cookies.get("accessToken");
 export const fetchWrapper = {
   get: request("GET"),
   post: request("POST"),
@@ -11,14 +13,17 @@ export const fetchWrapper = {
 };
 
 function request(method: any) {
-  return (url: any, body: any) => {
+  return (url: any, body: any = null, isSecure: boolean = false) => {
     const requestOptions: any = {
       method,
       headers: authHeader(url),
     };
-    if (body) {
+    if (body && method !== "GET" && method !== "HEAD") {
       requestOptions.headers["Content-Type"] = "application/json";
       requestOptions.body = JSON.stringify(body);
+    }
+    if (isSecure) {
+      requestOptions.headers["Authorization"] = `Bearer ${accessToken}`;
     }
     return fetch(url, requestOptions).then(handleResponse);
   };
@@ -46,7 +51,23 @@ async function handleResponse(response: any) {
 
   // check for error response
   if (!response.ok) {
-    if ([401, 403].includes(response.status) && userService.userValue) {
+    console.log(response);
+    if (response.status == 401 && response.statusText == "Unauthorized") {
+      // const newAccessToken = await authService.refreshToken();
+      // if (newAccessToken) {
+      //   return data;
+      // }
+      // if (newAccessToken) {
+      //   requestOptions.headers["Authorization"] = `Bearer ${newAccessToken}`;
+      //   return fetch(url, requestOptions).then((response) =>
+      //     handleResponse(response, url, requestOptions)
+      //   );
+      // } else {
+      //   userService.logout();
+      // }
+    }
+
+    if ([403].includes(response.status) && userService.userValue) {
       // auto logout if 401 Unauthorized or 403 Forbidden response returned from api
       userService.logout();
     }

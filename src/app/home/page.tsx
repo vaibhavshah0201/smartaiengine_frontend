@@ -1,19 +1,24 @@
+"use client";
 import Dashboard from "@/components/Dashboard/Dashboard";
-import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/context/AuthContext";
+import { getServerSession } from "next-auth";
+import { useEffect } from "react";
 
-export const metadata: Metadata = {
-  title:
-    "Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template",
-  description: "This is Next.js Home for TailAdmin Dashboard Template",
-};
+const Home = () => {
+  const { user }: any = useAuth();
+  console.log(user?.id);
 
-export default function Home() {
   return (
     <>
-      <DefaultLayout>
-        <Dashboard />
-      </DefaultLayout>
+      <ProtectedRoute>
+        <DefaultLayout>
+          <Dashboard />
+        </DefaultLayout>
+      </ProtectedRoute>
     </>
   );
-}
+};
+
+export default Home;

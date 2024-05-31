@@ -1,38 +1,37 @@
-import { useState } from "react";
+import React from "react";
 
-const CheckboxFour = () => {
-  const [isChecked, setIsChecked] = useState<boolean>(false);
-
+const CheckboxFour = (props: any) => {
   return (
     <div>
       <label
-        htmlFor="checkboxLabelFour"
+        htmlFor={`checkboxLabelFour_${props.value}`}
         className="flex cursor-pointer select-none items-center"
       >
         <div className="relative">
           <input
-            type="checkbox"
-            id="checkboxLabelFour"
+            type="radio"
+            id={`checkboxLabelFour_${props.value}`}
             className="sr-only"
-            onChange={() => {
-              setIsChecked(!isChecked);
-            }}
+            name="type" // Ensure the name attribute is the same for grouping
+            value={props.value}
+            checked={props.selectedType === props.value} // Control checked state
+            onChange={props.handleRadioChange}
           />
           <div
             className={`mr-4 flex h-5 w-5 items-center justify-center rounded-full border ${
-              isChecked && "border-primary"
+              props.selectedType === props.value
+                ? "border-primary"
+                : "border-gray-300"
             }`}
           >
             <span
               className={`h-2.5 w-2.5 rounded-full bg-transparent ${
-                isChecked && "!bg-primary"
+                props.selectedType === props.value ? "!bg-primary" : ""
               }`}
-            >
-              {" "}
-            </span>
+            />
           </div>
         </div>
-        Checkbox Text
+        {props.name}
       </label>
     </div>
   );

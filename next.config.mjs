@@ -13,7 +13,8 @@ const nextConfig = {
       "THIS IS USED TO SIGN AND VERIFY JWT TOKENS, REPLACE IT WITH YOUR OWN SECRET, IT CAN BE ANY STRING",
   },
   publicRuntimeConfig: {
-    apiUrl: "http://localhost:3000/api", // production api
+    // apiUrl: "http://localhost:3000/api", // production api
+    apiUrl: "http://localhost:8000", // local api
   },
 };
 

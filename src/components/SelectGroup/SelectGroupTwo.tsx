@@ -1,7 +1,11 @@
 "use client";
 import React, { useState } from "react";
+interface SelectDropdownProps {
+  labelHeader: string;
+  optionsData: any;
+}
 
-const SelectGroupTwo: React.FC = () => {
+const SelectGroupTwo = (props: SelectDropdownProps) => {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
@@ -11,8 +15,8 @@ const SelectGroupTwo: React.FC = () => {
 
   return (
     <div>
-      <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-        Select Country
+      <label className="mb-3 block text-sm font-medium text-black">
+        {props.labelHeader}
       </label>
 
       <div className="relative z-20 bg-white dark:bg-form-input">
@@ -58,17 +62,14 @@ const SelectGroupTwo: React.FC = () => {
           }`}
         >
           <option value="" disabled className="text-body dark:text-bodydark">
-            Select Country
+            {props.labelHeader}
           </option>
-          <option value="USA" className="text-body dark:text-bodydark">
-            USA
-          </option>
-          <option value="UK" className="text-body dark:text-bodydark">
-            UK
-          </option>
-          <option value="Canada" className="text-body dark:text-bodydark">
-            Canada
-          </option>
+          {props.optionsData &&
+            props.optionsData.map((item: any, key: number) => (
+              <option value={item.id} className="text-body dark:text-bodydark">
+                {item.name}
+              </option>
+            ))}
         </select>
 
         <span className="absolute right-4 top-1/2 z-10 -translate-y-1/2">
