@@ -31,16 +31,15 @@ async function login(username: any, password: any) {
     username,
     password,
   });
-  console.log(response.result);
-  const data = {
-    id: response.result.id,
-    username: response.result.username,
-  };
+  // const data = {
+  //   id: response.result.id,
+  //   username: response.result.username,
+  // };
   // publish user to subscribers and store in local storage to stay logged in between page refreshes
   userSubject.next(response);
   if (response.code === 200) {
     Cookies.set("accessToken", response.accessToken);
-    Cookies.set("userDetails", JSON.stringify(data));
+    Cookies.set("userDetails", response.result);
     Cookies.set("refreshToken", response.refreshToken);
   }
   return response;

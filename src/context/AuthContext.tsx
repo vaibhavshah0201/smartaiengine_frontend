@@ -17,29 +17,33 @@ export const AuthProvider = ({ children }: any) => {
   const [token, setToken] = useState<any>(null);
 
   useEffect(() => {
+    console.log('2oth called in context');
+    
     const accessToken: any = Cookies.get("accessToken");
     const userDetails: any = Cookies.get("userDetails");
 
     // let user = JSON.parse(userDetails);
-    let userDetailsString = Cookies.get("userDetails");
+    // let userDetailsString = Cookies.get("userDetails");
 
-    if (userDetailsString) {
-      try {
-        // Parse the JSON string back into an object
-        let user = JSON.parse(userDetailsString);
+    // if (userDetailsString) {
+    //   try {
+    //     // Parse the JSON string back into an object
+    //     let user = JSON.parse(userDetailsString);
 
-        // Now user is an object
-        console.log(user.id); // Outputs: 123
-        console.log(user.username); // Outputs: johndoe
-      } catch (e) {
-        console.error("Error parsing JSON from cookie:", e);
-      }
-    } else {
-      console.log("User details not found in cookie");
-    }
+    //     // Now user is an object
+    //     console.log(user.id); // Outputs: 123
+    //     console.log(user.username); // Outputs: johndoe
+    //   } catch (e) {
+    //     console.error("Error parsing JSON from cookie:", e);
+    //   }
+    // } else {
+    //   console.log("User details not found in cookie");
+    // }  
+    console.log(accessToken, 'accessToken');
+    
     if (accessToken) {
       setToken({ token: accessToken });
-      setUser(user);
+      setUser(userDetails);
     }
     const interval = setInterval(() => {
       refreshToken();
@@ -65,6 +69,8 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   const login = (token: any) => {
+    console.log('clogoi called');
+    
     setToken({ token });
   };
 

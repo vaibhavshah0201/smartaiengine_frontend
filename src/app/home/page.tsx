@@ -2,21 +2,23 @@
 import Dashboard from "@/components/Dashboard/Dashboard";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { useAuth } from "@/context/AuthContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { getServerSession } from "next-auth";
 import { useEffect } from "react";
 
 const Home = () => {
   const { user }: any = useAuth();
-  console.log(user?.id);
+  console.log('home called',user?.id);
 
   return (
     <>
+    <AuthProvider>
       <ProtectedRoute>
         <DefaultLayout>
           <Dashboard />
         </DefaultLayout>
       </ProtectedRoute>
+      </AuthProvider>
     </>
   );
 };

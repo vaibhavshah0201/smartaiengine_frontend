@@ -14,6 +14,13 @@
 }
 
 @layer utilities {
+
+    .delay-200 {
+        animation-delay: 200ms;
+      }
+      .delay-400 {
+        animation-delay: 400ms;
+      }
     /* Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
         display: none;
@@ -241,3 +248,4 @@ input[type="search"]::-webkit-search-cancel-button {
 [x-cloak] {
     display: none !important;
 }
+
