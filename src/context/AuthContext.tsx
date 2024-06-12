@@ -1,66 +1,68 @@
 "use client";
 
-import { createContext, useState, useEffect, useContext } from "react";
+import {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+} from "react";
 import Cookies from "js-cookie";
 import { fetchWrapper } from "@/helpers/fetch-wrapper";
+import { userService } from "@/services";
+import { useRouter } from "next/navigation";
+
 interface AuthContextType {
   user: any;
-  token: any;
-  login: (token: string) => void;
+  token: string | null;
+  login: (token: string, user: any) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: any) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any>(null);
-  const [token, setToken] = useState<any>(null);
-
+  const [token, setToken] = useState<string | null>(null);
+  const router = useRouter();
   useEffect(() => {
-    console.log('2oth called in context');
-    
-    const accessToken: any = Cookies.get("accessToken");
-    const userDetails: any = Cookies.get("userDetails");
+    const initializeAuthState = () => {
+      const accessToken = Cookies.get("accessToken");
+      const userDetails = Cookies.get("userDetails");
 
-    // let user = JSON.parse(userDetails);
-    // let userDetailsString = Cookies.get("userDetails");
+      if (accessToken && userDetails) {
+        setToken(accessToken);
+        // setUser(JSON.parse(userDetails));
+      } else {
+        setToken(null);
+        setUser(null);
+      }
+    };
 
-    // if (userDetailsString) {
-    //   try {
-    //     // Parse the JSON string back into an object
-    //     let user = JSON.parse(userDetailsString);
+    initializeAuthState();
 
-    //     // Now user is an object
-    //     console.log(user.id); // Outputs: 123
-    //     console.log(user.username); // Outputs: johndoe
-    //   } catch (e) {
-    //     console.error("Error parsing JSON from cookie:", e);
-    //   }
-    // } else {
-    //   console.log("User details not found in cookie");
-    // }  
-    console.log(accessToken, 'accessToken');
-    
-    if (accessToken) {
-      setToken({ token: accessToken });
-      setUser(userDetails);
-    }
     const interval = setInterval(() => {
       refreshToken();
     }, 15 * 60 * 1000); // Refresh token every 15 minutes
+
     return () => clearInterval(interval);
   }, []);
 
   const refreshToken = async () => {
     try {
       const refreshToken = Cookies.get("refreshToken");
+      if (!refreshToken) throw new Error("No refresh token available");
+
       const response = await fetchWrapper.post("http://localhost:8000/token", {
         token: refreshToken,
       });
+
       if (response.code === 200) {
         Cookies.set("accessToken", response.accessToken);
-        setToken({ token: response.accessToken });
+        setToken(response.accessToken);
         setUser(response.result);
+      } else {
+        throw new Error("Failed to refresh token");
       }
     } catch (error) {
       console.error("Token refresh failed:", error);
@@ -68,16 +70,33 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
-  const login = (token: any) => {
-    console.log('clogoi called');
-    
-    setToken({ token });
+  const login = async (username: string, password: any) => {
+    const res = await userService.login(username, password);
+
+    if (res.code == 200) {
+      setToken(res.accessToken);
+      Cookies.set("accessToken", res.accessToken);
+      Cookies.set("userDetails", res.result);
+      Cookies.set("refreshToken", res.refreshToken);
+      console.log(token);
+      router.push("/home");
+    }
+    // }
+    // Cookies.set("accessToken", token);
+    // router.push("/home");
+    // }
+    // Cookies.set("accessToken", token);
+    // Cookies.set("userDetails", JSON.stringify(user));
+    // setToken(token);
+    // setUser(user);
   };
 
   const logout = () => {
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
+    Cookies.remove("userDetails");
     setUser(null);
+    setToken(null);
   };
 
   return (
@@ -87,4 +106,10 @@ export const AuthProvider = ({ children }: any) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

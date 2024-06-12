@@ -1,21 +1,24 @@
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { userService } from "@/services";
-
+import { useAuth } from "@/context/AuthContext";
+import { Error } from "@/components/Alerts/Error";
 const SignIn = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<String>("");
 
+  const { login } = useAuth();
   const router = useRouter();
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-
-    const res = await userService.login(username, password);
+    const res: any = login(username, password);
     if (res.code == 200) {
+      setErrorMessage("");
       router.push("/home");
+    } else {
+      setErrorMessage("Invalid credentials.");
     }
   };
 
@@ -105,6 +108,7 @@ const SignIn = () => {
             </div>
           </form>
         </div>
+        {errorMessage != "" && <Error message={errorMessage} />}
       </div>
     </div>
   );

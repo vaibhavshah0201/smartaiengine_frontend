@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }: any) => {
   const { user, token }: any = useAuth();
-  const router:any = useRouter();
+  const router = useRouter();
 
   useEffect(() => {
     console.log(token, "token");
@@ -14,7 +14,11 @@ const ProtectedRoute = ({ children }: any) => {
     if (!token) {
       router.push("/"); // Redirect to login if not authenticated
     }
-  }, [token, router]);
+  }, [router, token]);
+
+  if (!token) {
+    return null;
+  }
 
   return children;
 };
